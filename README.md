@@ -1,0 +1,2 @@
+# shopping
+shop on django
