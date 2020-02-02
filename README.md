@@ -1,2 +1,2 @@
-# shopping
+# app
 shop on django
