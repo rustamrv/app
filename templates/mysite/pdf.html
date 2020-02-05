@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Онлайн-магазин</title>
+  <link href="{% static 'fonts/ArialBold.ttf' %}" rel="stylesheet" media="screen">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<script type="text/css">
+  @font-face { font-family: Arial; src: url("{% static 'fonts/ArialBold.ttf' %}"; }
+</script>
+<body>
+  <h1>Online shop</h1>
+  <p>
+    Order number: <b>{{ order.id }}</b> <br>
+    <span class="secondary">
+      {{ order.created }}
+    </span>
+  </p>
+  <h3>Покупатель</h3>
+  <p>
+    {{ order.fullname }}<br>
+    {{ order.email }} <br>
+    {{ order.city }}
+  </p>
+  <h3>Купленные товары</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Товар</th>
+        <th>Стоймость</th>
+        <th>Количество</th>
+        <th>Всего</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr class="row{% cycle '1' '2' %}">
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.get_cost }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="total">
+        <td colspan="3">Всего:</td>
+        <td class="num">{{ order.get_total }}</td>
+      </tr>
+    </tbody>
+  </table> 
+</body>
+
+</html>

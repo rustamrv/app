@@ -1,0 +1,25 @@
+{% load static %}
+{% block menu_header %}
+<nav class="navbar navbar-dark bg-dark">
+    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#show">
+        <img src="{% static 'images/cart.png' %}" alt="" /></button>
+    <div id="show" class="collapse">
+        {% if not cart %}
+            <p>Your cart is empty</p>
+        {% else %}
+            <a href="{% url 'cart_all' %}">Detail cart total products: {{cart}}</a>
+        {% endif %}
+    </div>
+    <ul class="nav navbar-tabs navbar-right">
+        {% if user.is_authenticated %}
+            <li class="p-3 welcome">
+                <p>Welcome, {{user}}!</p>
+            </li>
+            <li class="p-3"><a href="{% url 'logout' %}">Log out</a></li>
+        {% else %}
+            <li class="p-3"><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
+        <li class="p-3"><a href="#">Join</a></li>
+    </ul>
+</nav>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block menu %} 
+
+{% endblock %}
+{% block header %} 
+
+{% endblock %}
+
+{% block content %}
+<div class="form_login"> 
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+{% endblock %}
+{% block footer %}
+<footer id="footer" class="py-4 bg-dark text-white-50">
+  <div class="container text-center">
+    <small>Copyright &copy; Your Website</small>
+  </div>
+</footer>
+{% endblock %}

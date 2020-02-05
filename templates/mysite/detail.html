@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+  <h1 class="my-4">{{instance}}</h1>
+  <div class="row">
+    {% if instance.get_image  %}
+    <div class="col-md-8">
+      <img class="img-fluid" width="500px" height="750px" src="{{instance.get_image}}" alt="">
+    </div>
+    {% endif %}
+    <div class="col-md-4">
+      <h4 class="my-3">Price {{instance.price}}</h4>
+      <h6>{{instance.description}}</h6>
+      {% if instance.get_feature  %}
+      <h4 class="my-3">Feature</h4>
+      <tbody>
+      {% for item in instance.get_feature %}
+      <tr>
+        <th scope="row"></th>
+          <td>{{item.color.name}}</td>
+          <td>{{item.size.name}}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+  
+      {% endif %}
+
+    </div>
+
+  </div> 
+  <h3 class="my-4">Images</h3> 
+
+  <div class="row">
+    {% for item in instance.get_image_all %}
+    <div class="col-md-3 col-sm-6 mb-4">
+      <img class="img-fluid" width="300px" height="500px" src="{{item.image.url}}" alt="">
+      <div id='MyModal' class="modal">
+        <span class="close" onclick="document.getElementById('MyModal').style.display='none'">&times;</span>
+        <img class="modal-content" id='img01'>
+        <div id="caption"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer id="st-footer" class="py-4 bg-dark text-white-50">
+  <div class="container text-center">
+    <small>Copyright &copy; Your Website</small>
+  </div>
+</footer>
+{% endblock %}

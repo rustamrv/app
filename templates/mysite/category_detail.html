@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="alert alert-primary" role="alert">
+    Products {{count}}
+</div>
+
+<div class="col-sm-2" id="box_filter">
+    <div class="price_filter">
+        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_price">Цена</button>
+        <div id="show_price" class="collapse">
+            <section class="range-slider">
+                <span id="price_from">0 </span>
+                <input value="1" class="rangeRan" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
+                    onmousemove="rangeSlider(this.value)" onchange="rangeSlider(this.value)" type="range">
+                <span id="price_to">0</span>
+                <input class="rangeRan" value="1" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
+                    onmousemove="rangeSlider1(this.value)" onchange="rangeSlider1(this.value)" type="range">
+            </section>
+        </div>
+    </div>
+    <div class="color_filter">
+        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_color">Цвет</button>
+        <div id="show_color" class="collapse">
+            {% for item in color %}
+                <input type="checkbox" name="color" value="r1">{{item}}<br>
+            {% endfor %} 
+        </div>
+    </div> 
+    <div class="size_filter">
+        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_size">Размер</button>
+        <div id="show_size" class="collapse">
+            {% for item in size %}
+                <input type="checkbox" name="size" value="r1">{{item}}<br>
+            {% endfor %} 
+        </div>
+    </div>    
+    <button type="button" class="btn btn-light" id='OK' onclick="filter('{{category}}')">Применить</button>
+</div>
+<div class="main">
+
+    <div class="container">
+        <div class="row">
+
+            {% for item in products %}
+            <div class="card mb-4 ml-4 card_detail">
+                {% if item.get_image %}
+                <img class="card-img-top origin_img" src="{{item.get_image}}">
+                {% endif %}
+                <div class="card-body body_item">
+                    <h5 class="card-title">{{item}}</h5>
+                    {% if item.price %}
+                    <p class="card-text">{{item.price}}</p>
+                    {% endif %}
+                    <a href="{% url 'detail' slug=item.slug %}">
+                        <button type="button" class="btn btn-link">Подробно</button>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <div class="card_add">
+                        <input type="number" value="1" min="1" max="1000" step="1" id='{{item.id}}' />
+                        <button type="button" class="btn btn-light" id='add' onclick="add_item('{{item.id}}')">Добавить
+                            в
+                            корзину</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="container">
+        <ul class="pagination justify-content-center">
+            <span class="step-links">
+                {% if products.has_previous %}
+                <a href="?page={{ products.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                </span>
+
+                {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </ul>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block footer %}
+{% if count == 0 %}
+<footer id="footer" class="py-4 bg-dark text-white-50">
+    <div class="container text-center">
+        <small>Copyright &copy; Your Website</small>
+    </div>
+</footer>
+{% else %}
+<footer id="st-footer" class="py-4 bg-dark text-white-50">
+    <div class="container text-center">
+        <small>Copyright &copy; Your Website</small>
+    </div>
+</footer>
+{% endif %}
+{% endblock %}

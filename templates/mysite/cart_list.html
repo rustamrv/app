@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h1 class="cart_zakaz">Ваш заказ</h1> 
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Фото</th>
+            <th scope="col">Продукт</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Цена</th>
+            <th scope="col">Сумма</thscope="col">
+            <th scope="col">Удалить</th>
+        </tr>
+    </thead> 
+    <tbody>
+        {% for key in cart_all %}
+        <tr>
+            <th scope="row"></th>
+            <td><img src="{{key.product.get_image}}" width="200px" height="200px" alt="" /></td>
+            <td>{{key.product}}</td>
+            <td>{{key.quantity}}</td>
+            <td>{{key.price}}</td>
+            <td>{{key.total}}</td>
+            <td><button type="button" class="btn btn-light" onclick="delete_item('{{key.product.id}}')">Удалить</button></td>
+        </tr> 
+        {% endfor %}
+    </tbody>
+</table> 
+<a href="{% url 'form_order' %}" class="add_zakaz">Оформить</a>
+{% endblock %}
