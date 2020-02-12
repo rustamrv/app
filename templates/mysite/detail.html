@@ -35,8 +35,8 @@
     {% for item in instance.get_image_all %}
     <div class="col-md-3 col-sm-6 mb-4">
       <img class="img-fluid" width="300px" height="500px" src="{{item.image.url}}" alt="">
-      <div id='MyModal' class="modal">
-        <span class="close" onclick="document.getElementById('MyModal').style.display='none'">&times;</span>
+      <div id='modal' class="modal" onclick="img()">
+        <span class="close" onclick="document.getElementById('modal').style.display='none'">&times;</span>
         <img class="modal-content" id='img01'>
         <div id="caption"></div>
       </div>
@@ -44,6 +44,25 @@
     {% endfor %}
   </div>
 </div>
+<script>
+$(document).ready(function () { // Ждём загрузки страницы
+    var modal = document.getElementById('modal');
+    $('.img-fluid').click(function (event) {
+
+        var img = document.getElementById('img01');
+        var caption = document.getElementById('caption');
+        modal.style.display = 'block';
+        img.src = this.src;
+        caption.innerHTML = this.alt;
+    });
+    var span = document.getElementsByClassName('closa')[0];
+    span.onclick = function () {
+        modal.style.display = 'none';
+    }
+
+});
+</script>
+
 {% endblock %}
 
 {% block footer %}

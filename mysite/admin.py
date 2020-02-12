@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Gallery, Order, OrderItem, Feature, Size, ColorFeature
+from .models import *
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):  
@@ -19,20 +19,36 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_field = ['product']
 
+@admin.register(StatusOrder)
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'fullname', 'user', 'email', 'city', 'created', )
+    list_display = ('id', 'total_price', 'fullname', 'user', 'email', 'phone', 'city', 'status', 'created', )
     list_filter = ['created']
     inlines = [OrderItemInline]
 
-@admin.register(Feature)
-class FeatureAdmin(admin.ModelAdmin):
-    list_display = ('product', 'color', 'size', )
+
+class SizeFeatureAdmin(admin.TabularInline):
+    model = SizeFeature
+    raw_id_field = ['product']
+ 
+class ColorFeatureAdmin(admin.TabularInline):
+    model = ColorFeature
+    raw_id_field = ['product']
+
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('name', )
+    inlines = [SizeFeatureAdmin]
 
-@admin.register(ColorFeature)
+
+@admin.register(Color)
 class ColorAdmin(admin.ModelAdmin):
     list_display = ('name', )
+    inlines = [ColorFeatureAdmin]
+ 
+ 
+ 

@@ -13,13 +13,14 @@
             <section class="range-slider">
                 <span id="price_from">0 </span>
                 <input value="1" class="rangeRan" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
-                    onmousemove="rangeSlider(this.value)" onchange="rangeSlider(this.value)" type="range">
+                    onmousemove="rangeSlider('price_from', this.value)" onchange="rangeSlider('price_from', this.value)" type="range">
                 <span id="price_to">0</span>
                 <input class="rangeRan" value="1" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
-                    onmousemove="rangeSlider1(this.value)" onchange="rangeSlider1(this.value)" type="range">
+                    onmousemove="rangeSlider('price_to', this.value)" onchange="rangeSlider('price_to', this.value)" type="range">
             </section>
         </div>
     </div>
+    
     <div class="color_filter">
         <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_color">Цвет</button>
         <div id="show_color" class="collapse">
@@ -70,7 +71,7 @@
         </div>
 
     </div>
-
+    {% if count != 0 %}
     <div class="container">
         <ul class="pagination justify-content-center">
             <span class="step-links">
@@ -88,23 +89,8 @@
             </span>
         </ul>
     </div>
-
+    {% endif %}
 </div>
 {% endblock %}
 
-
-{% block footer %}
-{% if count == 0 %}
-<footer id="footer" class="py-4 bg-dark text-white-50">
-    <div class="container text-center">
-        <small>Copyright &copy; Your Website</small>
-    </div>
-</footer>
-{% else %}
-<footer id="st-footer" class="py-4 bg-dark text-white-50">
-    <div class="container text-center">
-        <small>Copyright &copy; Your Website</small>
-    </div>
-</footer>
-{% endif %}
-{% endblock %}
+ 

@@ -19,7 +19,7 @@
         {% else %}
             <li class="p-3"><a href="{% url 'login' %}">Login</a></li>
         {% endif %}
-        <li class="p-3"><a href="#">Join</a></li>
+        <li class="p-3"><a href="{% url 'signup' %}">Sign up</a></li>
     </ul>
 </nav>
 {% endblock %}

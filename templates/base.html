@@ -4,16 +4,12 @@
 
 <head>
 	<title>{{title}}</title>
-	<link href="{% static 'css/style.css' %}" rel='stylesheet' type='text/css' />
-    <script src = "{% static 'js/javascr.js' %}"></script>
+
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="{% static 'css/style.css' %}" rel='stylesheet' type='text/css' />
+	<link href="https://fonts.googleapis.com/css?family=Peralta" rel="stylesheet">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
 		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 </head>
 
@@ -30,9 +26,31 @@
 
 	{% block content %}
 	{% endblock %}
-	{% block footer %}
-	{% endblock %}
+	{% comment %} {% block footer %}
+	{% if count == 0 %}
+<footer id="footer" class="py-4 bg-dark text-white-50">
+    <div class="container text-center">
+        <small>Copyright &copy; Your Website</small>
+    </div>
+</footer>
+{% else %}
+<footer id="st-footer" class="py-4 bg-dark text-white-50">
+    <div class="container text-center">
+        <small>Copyright &copy; Your Website</small>
+    </div>
+</footer>
+{% endif %}
+	{% endblock %} {% endcomment %}
 
+	<script
+			  src="https://code.jquery.com/jquery-3.4.1.slim.js"
+			  integrity="sha256-BTlTdQO9/fascB1drekrDVkaKd9PkwBymMlHOiG+qLI="
+			  crossorigin="anonymous"></script>
+	  <script src = "{% static 'js/javascr.js' %}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	  
 
 </body> 
 </html>

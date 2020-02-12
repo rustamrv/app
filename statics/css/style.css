@@ -1,3 +1,8 @@
+body{
+	min-height: 100%; 
+	font-family: 'Peralta', cursive;
+  }
+
 #show {
 	color: white;
 	float: left;
@@ -6,6 +11,19 @@
 .welcome {
 	color: white;
 }
+
+.logo {
+	font-family: 'Peralta', cursive;
+   }
+   
+   .logo a {
+	color: rgba(0,0,0,.9);
+   }
+   
+   .logo a:hover,
+   .logo a:active {
+	text-decoration: none;
+   }
 
 .cart_zakaz {
 	text-align: center;
@@ -122,11 +140,7 @@
 	bottom: auto;
 	width: 100%;
 }
-
-#footer2 {
-	position: fixed;
-	width: 100%;
-}
+ 
 
 #price_from{
 	position: absolute;
