@@ -29,7 +29,9 @@ ALLOWED_HOSTS = []
 
 CART_SESSION_ID = 'cart'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+PROTOCOL = "127.0.0.1:8000"
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
@@ -128,6 +130,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ramazanovrv2020@gmail.com'
+EMAIL_HOST_PASSWORD = 'q5HxAM9sCkdL5tS'
+EMAIL_USE_TLS = True   
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/

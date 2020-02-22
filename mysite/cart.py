@@ -26,14 +26,14 @@ class Cart(object):
         self.save()
 
     # Сохранение данных в сессию
-    def save(self):  
+    def save(self):   
         self.session[settings.CART_SESSION_ID].update(self.cart) 
         # Указываем, что сессия изменена
         self.session.modified = True
 
     def remove(self, product_id):  
-        if str(product_id) in self.cart:  
-            del self.cart[str(product_id)]  
+        if str(product_id) in self.cart:    
+            self.cart.pop(product_id) 
             self.save()
 
     def __iter__(self): 

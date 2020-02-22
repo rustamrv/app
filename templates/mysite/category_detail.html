@@ -1,78 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
+ 
 
-{% block content %}
-<div class="alert alert-primary" role="alert">
+{% block content %} 
+<div class="alert alert-primary prod" role="alert">
     Products {{count}}
 </div>
+<div class="container">
 
-<div class="col-sm-2" id="box_filter">
+<div class="row">
+ <div class="col-2">
+    <div id="box_filter"> 
+
     <div class="price_filter">
-        <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_price">Цена</button>
+        <button type="button" class="btn btn-link myPrice" data-toggle="collapse" data-target="#show_price">Цена</button>
         <div id="show_price" class="collapse">
             <section class="range-slider">
-                <span id="price_from">0 </span>
+               
                 <input value="1" class="rangeRan" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
                     onmousemove="rangeSlider('price_from', this.value)" onchange="rangeSlider('price_from', this.value)" type="range">
-                <span id="price_to">0</span>
+                 <span id="price_from">0 </span>
+              
                 <input class="rangeRan" value="1" min="{{min.price__min}}" max="{{max.price__max}}" step="1"
                     onmousemove="rangeSlider('price_to', this.value)" onchange="rangeSlider('price_to', this.value)" type="range">
+                  <span id="price_to">0</span>
             </section>
         </div>
-    </div>
-    
-    <div class="color_filter">
+    </div> 
+
+  <div class="color_filter">
         <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_color">Цвет</button>
         <div id="show_color" class="collapse">
             {% for item in color %}
                 <input type="checkbox" name="color" value="r1">{{item}}<br>
             {% endfor %} 
         </div>
-    </div> 
-    <div class="size_filter">
+    </div>
+
+      <div class="size_filter">
         <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#show_size">Размер</button>
         <div id="show_size" class="collapse">
             {% for item in size %}
                 <input type="checkbox" name="size" value="r1">{{item}}<br>
             {% endfor %} 
         </div>
-    </div>    
-    <button type="button" class="btn btn-light" id='OK' onclick="filter('{{category}}')">Применить</button>
-</div>
-<div class="main">
+    </div> 
 
-    <div class="container">
-        <div class="row">
+     <button type="button" class="btn btn-light" id='OK' onclick="filter('{{category}}')">Применить</button>
 
-            {% for item in products %}
+    </div>
+
+ </div>
+
+ <div class="col-10">
+  <div class="cards">
+    <div class="row">
+          {% for item in products %}
             <div class="card mb-4 ml-4 card_detail">
                 {% if item.get_image %}
-                <img class="card-img-top origin_img" src="{{item.get_image}}">
+                    <img class="card-img-top origin_img" src="{{item.get_image}}">
+                {% else %}
+                    <img class="card-img-top origin_img" src="{% static 'main_images/Empty.png' %}" >
                 {% endif %}
                 <div class="card-body body_item">
                     <h5 class="card-title">{{item}}</h5>
                     {% if item.price %}
-                    <p class="card-text">{{item.price}}</p>
+                        <p class="card-text">{{item.price}}</p>
                     {% endif %}
                     <a href="{% url 'detail' slug=item.slug %}">
                         <button type="button" class="btn btn-link">Подробно</button>
                     </a>
-                    {% if user.is_authenticated %}
+                    {% if request.user.is_authenticated %}
                     <div class="card_add">
                         <input type="number" value="1" min="1" max="1000" step="1" id='{{item.id}}' />
-                        <button type="button" class="btn btn-light" id='add' onclick="add_item('{{item.id}}')">Добавить
+                        <button type="button" class="btn btn-light add_cart_bt" onclick="add_item('{{item.id}}')">Добавить
                             в
                             корзину</button>
                     </div>
+                    {% else %}
+                        <div class="card_add">
+                            <small>Для добавление в корзину нужно авторизироваться</small>
+                        </div>
                     {% endif %}
                 </div>
             </div>
-            {% endfor %}
-        </div>
-
+             {% endfor %}
     </div>
-    {% if count != 0 %}
-    <div class="container">
+     {% if count != 0 %}
+<div class="container">
         <ul class="pagination justify-content-center">
             <span class="step-links">
                 {% if products.has_previous %}
@@ -89,8 +104,15 @@
             </span>
         </ul>
     </div>
-    {% endif %}
+{% endif %}
+  </div>
+
+ </div>
+
 </div>
-{% endblock %}
+
+</div>
+{% endblock %}   
+ 
 
  

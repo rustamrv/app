@@ -3,28 +3,29 @@ from django.views.generic import UpdateView, ListView, DetailView, CreateView
 from .models import *
 from django.conf import settings
 from .cart import Cart
-# from forms import Form_Order
+from .forms import Form_Order
 from django.core.mail import send_mail, EmailMessage
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 from django.template.loader import get_template
 from io import BytesIO 
 from django.db.models import Max, Min, Q
-
+from django.contrib.auth.models import User
 
 
 class MarketList(ListView):
 
     model = Category
+ 
     template = 'category_list.html'
     paginate_by = 6
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         data = Category.objects.filter(parent__isnull=True)
-        products = Product.objects.filter(parent__isnull=True)
+        products = Product.objects.parents_isnull()
         paginator = Paginator(products, self.paginate_by)
         page = self.request.GET.get('page')
 
@@ -52,7 +53,8 @@ class DetailCategory(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         data = Category.objects.filter(parent__isnull=True)
-        products = Product.objects.filter(parent=self.get_object()).filter(is_active=True).order_by('price')
+        products = Product.objects.is_active().get_parent(self.get_object()).order_by('price')
+        
         cart = Cart(self.request)
         page = self.request.GET.get('page')
         
@@ -89,8 +91,7 @@ class ProductDetail(DetailView):
     template_name = 'mysite/detail.html'
 
     def get_context_data(self, **kwargs):
-        product = self.get_object()
-        product.get_image_all()
+        product = self.get_object() 
         context = super().get_context_data(**kwargs)
         context['instance'] = product
         context['title'] = str(product)
@@ -102,10 +103,10 @@ def add_item(request):
         quantity = request.GET.get('quantity')
         product_id = request.GET.get('product_id')
         product = Product.objects.get(id=product_id)
-        cart = Cart(request)
+        cart = Cart(request)  
         cart.add(product, quantity, True)
         data = Category.objects.filter(parent__isnull=True)
-        products = Product.objects.filter(parent=product.parent).order_by('price')
+        products = Product.objects.get_parent(product.parent).order_by('price')
         page = request.GET.get('page')
         if page == None:
             page = 1
@@ -134,6 +135,7 @@ def delete_item(request):
     if request.method == "GET":
         cart = Cart(request)
         product_id = request.GET.get('product_id')
+        product = Product.objects.get(id=product_id)
         cart.remove(product_id)
 
         content = {
@@ -168,13 +170,21 @@ def filter_shop(request):
             product_f.add(str(it.product))  
         name_category = request.GET.get('category') 
         parent = Category.objects.get(name=name_category) 
-        products = Product.objects.filter(parent=parent, is_active=True).filter(name__in=list(product_f))
-        print(price_from, price_to)
+        product_f = list(product_f)
+        products = Product.objects.is_active().get_parent(parent) 
+        if not len(product_f) == 0:
+            products = products.name_in(product_f) 
         if not price_from == 0: 
-            products = products.filter(Q(price__gte=price_from) & Q(price__lte=price_to))      
+            products = products.prices_gte(price_from)
+        if not price_to == 0: 
+            products = products.price_lte(price_to)
+        
         page = request.GET.get('page') 
         paginator = Paginator(products, 6)
         
+        size = Size.objects.all()
+        color = Color.objects.all()
+
         data = Category.objects.filter(parent__isnull=True) 
         
         cart = Cart(request)
@@ -192,65 +202,68 @@ def filter_shop(request):
             'categories': data,
             'products': products_all,
             'count': products.count(),
+            'max': products.aggregate(Max('price')),
+            'min': products.aggregate(Min('price')),
             'title': "Список товаров",
-            'page': page 
+            'page': page, 
+            'size': size,
+            'color': color,
+            'category': parent
         }
         return render(request, "mysite/category_detail.html", content)
 
 
 def checkout(request):
-    return None
-    # if request.method == "POST":
-    #     form = Form_Order(request.POST) 
-    #     if form.is_valid():
-    #         cart = Cart(request)
-    #         name = form.cleaned_data['name']
-    #         recip = settings.EMAIL_HOST_USER
-    #         sender = form.cleaned_data['email']
-    #         city = form.cleaned_data['city']
-    #         user = request.user
-    #         order = Order.objects.create(
-    #             fullname=name, user=user, email=sender, city=city)
-    #         items = []
-    #         for item in cart:
-    #             orderitem = OrderItem.objects.create(
-    #                 order=order, product=item['product'], quantity=item['quantity'], price=item['price'])
-    #             items.append(orderitem)
-    #         cart.clear()
-    #         subject = 'Онлайн-магазин - заказ: {}'.format(order.id)
-    #         context = {
-    #             'order': order,
-    #             'items': items
-    #         }
-    #         template = get_template('market/pdf.html')
-    #         html = template.render(context)
-    #         email = EmailMessage(subject, '', sender, [recip])
+    if request.method == "POST":
+        form = Form_Order(request.POST) 
+        if form.is_valid():
+            cart = Cart(request)
+            name = form.cleaned_data['name']
+            recip = settings.EMAIL_HOST_USER
+            sender = form.cleaned_data['email']
+            city = form.cleaned_data['city']
+            user = request.user
+            order = Order.objects.create(
+                fullname=name, user=user, email=sender, city=city)
+            items = []
+            for item in cart:
+                orderitem = OrderItem.objects.create(
+                    order=order, product=item['product'], quantity=item['quantity'], price=item['price'])
+                items.append(orderitem)
+            cart.clear()
+            subject = 'Онлайн-магазин - заказ: {}'.format(order.id)
+            context = {
+                'order': order,
+                'items': items
+            }
+            template = get_template('mysite/pdf.html')
+            html = template.render(context)
+            email = EmailMessage(subject, '', sender, [recip])
 
-    #         pdf = render_to_pdf('market/pdf.html', context)
+            pdf = render_to_pdf('mysite/pdf.html', context)
              
-    #         if not pdf == None:
-    #             email.attach('order_{}.pdf'.format(order.id),
-    #                          pdf.getvalue(), 'application/pdf')
-    #         else:
-    #             pdf = HttpResponseNotFound(
-    #                 'The requested pdf was not found in our server.')
-    #         email.send()
+            if not pdf == None:
+                email.attach('order_{}.pdf'.format(order.id),
+                             pdf.getvalue(), 'application/pdf')
+            else:
+                pdf = HttpResponseNotFound(
+                    'The requested pdf was not found in our server.')
+            email.send()
 
-    #         return pdf
+            return pdf
 
 
 def form_order(request):
     if request.method == "GET":
-        return None
-        # cart = Cart(request)
-        # form = Form_Order()
-        # content = {
-        #     'cart': len(cart),
-        #     'cart_all': cart,
-        #     'title': "Ваш заказ",
-        #     'form': form
-        # }
-        # return render(request, "mysite/form_order.html", content)
+        cart = Cart(request)
+        form = Form_Order()
+        content = {
+            'cart': len(cart),
+            'cart_all': cart,
+            'title': "Ваш заказ",
+            'form': form
+        }
+        return render(request, "mysite/form_order.html", content)
 
 
 def render_to_pdf(template_src, context_dict={}):

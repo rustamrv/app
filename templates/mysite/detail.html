@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 <div class="container">
   <h1 class="my-4">{{instance}}</h1>
@@ -8,6 +9,10 @@
     <div class="col-md-8">
       <img class="img-fluid" width="500px" height="750px" src="{{instance.get_image}}" alt="">
     </div>
+    {% else %}
+             <div class="col-md-8">
+                    <img class="card-img-top origin_img" src="{% static 'main_images/Empty.png' %}">
+            </div>        
     {% endif %}
     <div class="col-md-4">
       <h4 class="my-3">Price {{instance.price}}</h4>
@@ -18,7 +23,7 @@
       {% for item in instance.get_feature %}
       <tr>
         <th scope="row"></th>
-          <td>{{item.color.name}}</td>
+          {% comment %} <td>{{item.color.name}}</td> {% endcomment %}
           <td>{{item.size.name}}</td>
         </tr>
       {% endfor %}
@@ -29,10 +34,12 @@
     </div>
 
   </div> 
-  <h3 class="my-4">Images</h3> 
-
   <div class="row">
+     {% if instance.get_image_all  %}
+   <h3 class="my-4">Images</h3> 
+     {% endif %}
     {% for item in instance.get_image_all %}
+    
     <div class="col-md-3 col-sm-6 mb-4">
       <img class="img-fluid" width="300px" height="500px" src="{{item.image.url}}" alt="">
       <div id='modal' class="modal" onclick="img()">
@@ -44,7 +51,9 @@
     {% endfor %}
   </div>
 </div>
+ 
 <script>
+    
 $(document).ready(function () { // Ждём загрузки страницы
     var modal = document.getElementById('modal');
     $('.img-fluid').click(function (event) {
@@ -64,11 +73,4 @@ $(document).ready(function () { // Ждём загрузки страницы
 </script>
 
 {% endblock %}
-
-{% block footer %}
-<footer id="st-footer" class="py-4 bg-dark text-white-50">
-  <div class="container text-center">
-    <small>Copyright &copy; Your Website</small>
-  </div>
-</footer>
-{% endblock %}
+ 

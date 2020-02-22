@@ -2,12 +2,12 @@
 {% block menu_header %}
 <nav class="navbar navbar-dark bg-dark">
     <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#show">
-        <img src="{% static 'images/cart.png' %}" alt="" /></button>
+        <img src="{% static 'main_images/cart.png' %}" alt="" /></button>
     <div id="show" class="collapse">
         {% if not cart %}
-            <p>Your cart is empty</p>
+            <p>Ваша корзина пуста</p>
         {% else %}
-            <a href="{% url 'cart_all' %}">Detail cart total products: {{cart}}</a>
+            <a href="{% url 'cart_all' %}">Количество товаров в корзине: {{cart}}</a>
         {% endif %}
     </div>
     <ul class="nav navbar-tabs navbar-right">

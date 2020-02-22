@@ -29,8 +29,8 @@ function filter(category) {
             size: size,
             category: category,
         },
-        success: function (data) {
-            $("body").html(data)
+        success: function (data) { 
+            $("html").html(data)
         },
         error: function (xhr, status, e) {
         },
@@ -52,7 +52,7 @@ function add_item(product_id) {
             product_id: product_id,
         },
         success: function (data) {
-            $("body").html(data)
+            $("html").html(data)
         },
         error: function (xhr, status, e) {
             // console.log(status);
@@ -61,3 +61,30 @@ function add_item(product_id) {
     });
 }
  
+function delete_item(id){  
+    $.ajax({
+        type: 'GET',
+        async: true,
+        url: 'delete_item',
+        data: {
+            ajax: true, 
+            product_id: id,
+        },
+        success: function (data) {
+            $("html").html(data)
+        },
+        error: function (xhr, status, e) {
+            // console.log(status);
+        },
+        dataType: '',
+    });
+}
+
+$(document).ready(function () { // Ждём загрузки страницы 
+    var w=window.innerWidth,
+     h=document.body.clientHeight;    
+    if (h==434){   
+        $("#footer").css("margin-top", 545) 
+    }
+
+});

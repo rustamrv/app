@@ -27,6 +27,52 @@ class Category(models.Model):
         return self.parent
 
 
+class ProductQuerySet(models.QuerySet):
+    
+    def is_active(self):
+        return self.filter(is_active=True)
+
+    def name_in(self, array):
+        return self.filter(name__in=array)
+
+    def get_parent(self, name):
+        return self.filter(parent=name)
+
+    def parent_isnull(self):
+        return self.filter(parent__isnull=True)
+
+    def prices_gte(self, price_from):
+        return self.filter(price__gte=price_from)
+
+    def price_lte(self, price_to):
+        return self.filter(price__lte=price_to)
+
+
+class ProductManager(models.Manager):
+
+    def queryset(self):
+        return ProductQuerySet(self.model, using=self._db)
+
+    def is_active(self):
+        return self.queryset().is_active()
+
+    def name_in(self, array):
+        return self.queryset().name_in(array)
+
+    def get_parent(self, name):
+        return self.queryset().get_parent(name)
+
+    def parents_isnull(self): 
+        return self.queryset().parent_isnull()
+
+    def prices_gte(self, price_from):
+        return self.queryset().prices_gte(price_from)
+
+    def price_lte(self, price_to):
+        return self.queryset().price_lte(price_to)
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True) 
@@ -34,6 +80,8 @@ class Product(models.Model):
     price = models.DecimalField(blank=True, null=True, max_digits=7, decimal_places=2)
     is_active = models.BooleanField(default=True)
     parent = models.ForeignKey(Category, blank=True, null=True, on_delete=models.CASCADE)
+
+    objects = ProductManager()
 
     class Meta:
         ordering = ['-id']
@@ -54,7 +102,7 @@ class Product(models.Model):
         return obj
 
     def get_feature(self):
-        obj = Feature.objects.filter(product=self)
+        obj = SizeFeature.objects.filter(product=self)
         if not obj.exists():
             return None 
         return obj
