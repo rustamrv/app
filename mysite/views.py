@@ -13,6 +13,8 @@ from django.template.loader import get_template
 from io import BytesIO 
 from django.db.models import Max, Min, Q
 from django.contrib.auth.models import User
+from django.views import View
+from django.contrib.postgres.search import SearchVector
 
 
 class MarketList(ListView):
@@ -70,7 +72,7 @@ class DetailCategory(DetailView):
             products_all = paginator.page(1)
         except EmptyPage:
             products_all = paginator.page(paginator.num_pages)
-
+ 
         context['cart'] = len(cart)
         context['categories'] = data
         context['products'] = products_all
@@ -98,8 +100,9 @@ class ProductDetail(DetailView):
         return context
 
 
-def add_item(request):
-    if request.method == "GET":
+class AddItem(View):
+
+    def get(self, request, *args, **kwargs): 
         quantity = request.GET.get('quantity')
         product_id = request.GET.get('product_id')
         product = Product.objects.get(id=product_id)
@@ -131,13 +134,13 @@ def add_item(request):
         return render(request, "mysite/category_detail.html", content)
 
 
-def delete_item(request):
-    if request.method == "GET":
-        cart = Cart(request)
+class DeleteItem(View):
+
+    def get(self,  request, *args, **kwargs):
+        cart = Cart(request) 
         product_id = request.GET.get('product_id')
-        product = Product.objects.get(id=product_id)
-        cart.remove(product_id)
-
+        # product = Product.objects.get(id=product_id)
+        cart.remove(product_id) 
         content = {
             'cart': len(cart),
             'cart_all': cart,
@@ -145,20 +148,22 @@ def delete_item(request):
         }
         return render(request, "mysite/cart_list.html", content)
 
+class CartList(View):
 
-def cart_list(request):
-    if request.method == "GET":
+    def get(self, request, *args, **kwargs):
         cart = Cart(request)
         content = {
             'cart': len(cart),
             'cart_all': cart,
             'title': "Ваша корзина"
         }
+        print(cart.cart)
         return render(request, "mysite/cart_list.html", content)
 
 
-def filter_shop(request): 
-    if request.method == "GET": 
+class Filter(View):
+
+    def get(self, request, *args, **kwargs):
         price_from = request.GET.get('price_from')
         price_to = request.GET.get('price_to')
         size_arr = request.GET.getlist('size[]')
@@ -211,10 +216,43 @@ def filter_shop(request):
             'category': parent
         }
         return render(request, "mysite/category_detail.html", content)
+         
+
+class SearchField(View):
+
+    def get(self, request, *args, **kwargs):  
+        data = Category.objects.filter(parent__isnull=True)  
+        cart = Cart(request) 
+        search_vector = SearchVector('name', 'description')
+        search = request.GET.get('search_text') 
+        products = Product.objects.annotate(search=search_vector).filter(search=search)
+        page = request.GET.get('page')   
+        paginator = Paginator(products, 6) 
+        try:
+            products_all = paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            products_all = paginator.page(1)
+        except EmptyPage:
+            products_all = paginator.page(paginator.num_pages)
+ 
+        content = {
+            'cart': len(cart), 
+            'categories': data,
+            'products': products_all,
+            'count': products.count(),
+            'max': products.aggregate(Max('price')),
+            'min': products.aggregate(Min('price')),
+            'title': "Поиск товаров",
+            'page': page,  
+        }
+
+        return render(request, "mysite/search_result.html", content)
 
 
-def checkout(request):
-    if request.method == "POST":
+class Checkout(View):
+
+    def post(self, request, *args, **kwargs):
         form = Form_Order(request.POST) 
         if form.is_valid():
             cart = Cart(request)
@@ -240,9 +278,8 @@ def checkout(request):
             html = template.render(context)
             email = EmailMessage(subject, '', sender, [recip])
 
-            pdf = render_to_pdf('mysite/pdf.html', context)
-             
-            if not pdf == None:
+            pdf = self.render_to_pdf('mysite/pdf.html', context) 
+            if not pdf == None: 
                 email.attach('order_{}.pdf'.format(order.id),
                              pdf.getvalue(), 'application/pdf')
             else:
@@ -253,8 +290,23 @@ def checkout(request):
             return pdf
 
 
-def form_order(request):
-    if request.method == "GET":
+    def render_to_pdf(self, template_src, context_dict={}):
+        template = get_template(template_src)
+        html = template.render(context_dict)
+        result = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")),
+                                result, encoding='utf-8', show_error_as_pdf=True)
+        if not pdf.err:
+            response = HttpResponse(
+                result.getvalue(), content_type='application/pdf')
+            return response
+        return None
+
+
+
+class Order(View):
+
+    def get(self, request, *args, **kwargs):
         cart = Cart(request)
         form = Form_Order()
         content = {
@@ -266,14 +318,4 @@ def form_order(request):
         return render(request, "mysite/form_order.html", content)
 
 
-def render_to_pdf(template_src, context_dict={}):
-    template = get_template(template_src)
-    html = template.render(context_dict)
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")),
-                            result, encoding='utf-8', show_error_as_pdf=True)
-    if not pdf.err:
-        response = HttpResponse(
-            result.getvalue(), content_type='application/pdf')
-        return response
-    return None
+

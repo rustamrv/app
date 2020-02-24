@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from slugify import slugify
 from phone_field import PhoneField
 from django.db.models.signals import post_save, pre_save
+from django.contrib.postgres.indexes import GinIndex
 
 
 class Category(models.Model):
@@ -83,7 +84,7 @@ class Product(models.Model):
 
     objects = ProductManager()
 
-    class Meta:
+    class Meta: 
         ordering = ['-id']
 
     def __str__(self):

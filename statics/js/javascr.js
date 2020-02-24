@@ -60,7 +60,7 @@ function add_item(product_id) {
         dataType: '',
     });
 }
- 
+
 function delete_item(id){  
     $.ajax({
         type: 'GET',
